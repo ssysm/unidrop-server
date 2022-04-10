@@ -29,12 +29,13 @@ const s3Params = {
     ContentType: 'application/octet-stream'
 };
 
-
 router.get('/share/ip', async (req, res) => { 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     try{
         const share = await prisma.share.findFirst({
-            where: { shareIP : ip },
+            where: { shareIP : ip , timestamp:{
+                gt: new Date(Date.now() - (1000 * 60 * 3)) // 3 minutes
+            } },
             orderBy:{
                 timestamp: "desc"
             }
@@ -135,7 +136,7 @@ router.post('/share',async function(req, res, next) {
                 }
             });
             // set id to redis cache with respect to code and
-            // expire in 5 minutes
+            // expire in 3 minutes
             await redisClient.set(code, docs.id, 'EX', 180);
             handler(res,null,{docs, code});
         }
@@ -145,5 +146,21 @@ router.post('/share',async function(req, res, next) {
     }
 
 });
+
+// delete all share entry by ip
+router.delete('/share', async(req, res, next) => {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    try{
+        const docs = await prisma.share.deleteMany({
+            where: {
+                shareIP: ip
+            }
+        });
+        handler(res,null,docs);
+    }catch(e){
+        handler(res,e,null);
+        throw e;
+    }
+})
 
 module.exports = router;
