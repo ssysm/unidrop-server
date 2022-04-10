@@ -31,6 +31,7 @@ const s3Params = {
 
 router.get('/share/ip', async (req, res) => { 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.log(`ip: ${ip}`);
     try{
         const share = await prisma.share.findFirst({
             where: { shareIP : ip , timestamp:{
