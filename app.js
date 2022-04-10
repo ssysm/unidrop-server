@@ -6,6 +6,10 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 
+const setupRedis = async()=>{
+    await redisClient.connect();
+};
+
 var app = express();
 
 setupRedis();
@@ -18,9 +22,5 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter.rootRouter);
-
-const setupRedis = async()=>{
-    await redisClient.connect();
-};
 
 module.exports = app;
