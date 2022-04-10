@@ -6,13 +6,7 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 
-const setupRedis = async()=>{
-    await redisClient.connect();
-};
-
 var app = express();
-
-setupRedis();
 
 app.use(logger('dev'));
 app.use(cors());

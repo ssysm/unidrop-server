@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const redisClient = createClient();
 const prisma = new PrismaClient();
+redisClient.connect();
 
 const router = express.Router();
 const s3 = new S3({ 
