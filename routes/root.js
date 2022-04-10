@@ -124,7 +124,7 @@ router.post('/share',async function(req, res, next) {
             });
             // set id to redis cache with respect to code and
             // expire in 5 minutes
-            await redisClient.set(code, docs.id, 'EX', 300);
+            await redisClient.set(code, docs.id, 'EX', 180);
             handler(res,null,{docs, signedUrl, code});
         }else{
             const docs = await prisma.share.create({
@@ -136,7 +136,7 @@ router.post('/share',async function(req, res, next) {
             });
             // set id to redis cache with respect to code and
             // expire in 5 minutes
-            await redisClient.set(code, docs.id, 'EX', 300);
+            await redisClient.set(code, docs.id, 'EX', 180);
             handler(res,null,{docs, code});
         }
     }catch(e){
