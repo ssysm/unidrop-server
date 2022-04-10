@@ -51,7 +51,6 @@ router.get('/share/ip', async (req, res) => {
 router.get('/share/code',async function(req, res, next) {
     const { code } = req.query;
     try {
-        await redisClient.connect();
         // find id from redis cache by code
         const id = await redisClient.get(code);
         if (id === null){
@@ -66,9 +65,7 @@ router.get('/share/code',async function(req, res, next) {
             throw 'Not a valid share code';
         }
         handler(res, null, share);
-        redisClient.disconnect();
     }catch(e){
-        redisClient.disconnect();
         handler(res,e,null);
         throw e;
     }
@@ -104,9 +101,8 @@ router.post('/share',async function(req, res, next) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const code = getWord();
     try{
-        await redisClient.connect();
         if (contentType === 'FILE'){
-            // split the file name a          qq qqqqqqqqqqqqqqqqqq                                                                                                                                                                                                                                                                                                                                                                               nd extension
+            // split the file name a                                                                                                                                                                                                                                                                                                                                                                            nd extension
             const fileNameSplit = fileName.split('.');
             const fileExtension = fileNameSplit[fileNameSplit.length - 1];
             const fileNameWithoutExtension = fileName.replace(`${fileExtension}`, '');
@@ -142,15 +138,11 @@ router.post('/share',async function(req, res, next) {
             await redisClient.set(code, docs.id, 'EX', 300);
             handler(res,null,{docs, code});
         }
-        redisClient.disconnect();
     }catch(e){
-        redisClient.disconnect();
         handler(res,e,null);
         throw e;
     }
 
 });
-
-
 
 module.exports = router;
